@@ -15,7 +15,7 @@ jobs:
 
       - name: Download LAC
         run: |
-          wget https://lacrimesonline.com/builds/LAC/LAC_Linux_v1.9.7.zip
+          wget https://lacrimesonline.com/builds/LAC_Linux_v1.9.7.zip
 
       - name: Extract LAC
         run: |
