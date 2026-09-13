@@ -1,27 +1,60 @@
-name: LAC Server
+name: LAC Free 30 Server
 
 on:
   workflow_dispatch:
 
 jobs:
   server:
+    name: LAC Free 30
     runs-on: ubuntu-24.04
 
     steps:
+
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y screen unzip libc6-i386 lib32stdc++6
+          sudo apt-get install -y screen unzip libc6-i386 lib32stdc++6 curl
 
-      - name: Download LAC
+      - name: Disable IPv6
+        run: |
+          sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+          sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+          sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+
+      - name: Check network
+        run: |
+          echo "=============================="
+          echo "IPv6 addresses:"
+          echo "=============================="
+          ip -6 addr show
+
+          echo "=============================="
+          echo "IPv4 addresses:"
+          echo "=============================="
+          ip -4 addr show
+
+          echo "=============================="
+          echo "Public IPv4:"
+          echo "=============================="
+          curl -4 https://api.ipify.org
+          echo
+
+      - name: Download LAC Server
         run: |
           wget https://lacrimesonline.com/builds/LAC_Linux_v1.9.7.zip
 
-      - name: Extract LAC
+      - name: Extract LAC Server
         run: |
           unzip LAC_Linux_v1.9.7.zip
           chmod +x LAC_Linux_v1.9.7.x86_64
 
-      - name: Start server
+      - name: Create LAC config directory
         run: |
+          mkdir -p /root/.config/unity3d/MA/LAC
+
+      - name: Start LAC Server
+        run: |
+          echo "======================================"
+          echo "Starting LAC Free 30 Server"
+          echo "======================================"
           ./LAC_Linux_v1.9.7.x86_64
