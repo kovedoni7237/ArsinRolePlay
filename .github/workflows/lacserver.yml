@@ -1,0 +1,124 @@
+name: LAC Server Testt
+
+on:
+  workflow_dispatch:
+
+jobs:
+  server:
+    name: LAC Server
+    runs-on: ubuntu-24.04
+
+    steps:
+
+      # -----------------------------
+      # Install required packages
+      # -----------------------------
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y screen unzip libc6-i386 lib32stdc++6 curl
+
+      # -----------------------------
+      # Disable IPv6
+      # -----------------------------
+      - name: Disable IPv6
+        run: |
+          sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+          sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+          sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+
+      # -----------------------------
+      # Check network
+      # -----------------------------
+      - name: Check network
+        run: |
+          echo "========== IPv6 =========="
+          ip -6 addr show
+
+          echo "========== IPv4 =========="
+          ip -4 addr show
+
+          echo "========== PUBLIC IPv4 =========="
+          curl -4 https://api.ipify.org
+          echo
+
+      # -----------------------------
+      # Download LAC Linux Server
+      # -----------------------------
+      - name: Download LAC
+        run: |
+          wget https://lacrimesonline.com/builds/LAC/LAC_Linux_v1.9.7.zip
+
+      # -----------------------------
+      # Extract server
+      # -----------------------------
+      - name: Extract LAC
+        run: |
+          unzip LAC_Linux_v1.9.7.zip
+          chmod +x LAC_Linux_v1.9.7.x86_64
+
+      # -----------------------------
+      # Create LAC config directory
+      # -----------------------------
+      - name: Create LAC config directory
+        run: |
+          mkdir -p "$HOME/.config/unity3d/MA/LAC"
+
+      # -----------------------------
+      # Create ServerConfig.txt
+      # -----------------------------
+      - name: Create ServerConfig
+        run: |
+          cat > "$HOME/.config/unity3d/MA/LAC/ServerConfig.txt" <<'EOF'
+          # Maps
+          # Maps (City, Garage, RagdollParty, TrainFacility)
+          # Maps (ZombieSurvival, NewTerrainRamps, Island, CarSoccer)
+          # Editor Maps (editor:myMap)
+
+          # make map rotation with ","
+          # players can get admin by typing "/YOUR-NUM-CODE" in the chat
+          # lock down will avoids changes in: server option, editor obj sync
+
+          (Moderator)
+          admin code=LAC30
+          lock down=true
+
+          (Basic)
+          restart timer=never
+          max players=31
+          map name=TrainFacility
+          starting port=7777
+
+          (Server List)
+          share to community=true
+          server language=English
+          server password=none
+
+          (Roleplay)
+          username=HOSTm
+          password=0000
+          EOF
+
+      # -----------------------------
+      # Show configuration
+      # -----------------------------
+      - name: Check ServerConfig
+        run: |
+          echo "========== ServerConfig.txt =========="
+          cat "$HOME/.config/unity3d/MA/LAC/ServerConfig.txt"
+          echo "====================================="
+
+      # -----------------------------
+      # Start LAC
+      # -----------------------------
+      - name: Start LAC Server
+        run: |
+          echo "======================================"
+          echo "       LAC testt SERVER"
+          echo "======================================"
+          echo "Map: TrainFacility"
+          echo "Max Players: 30"
+          echo "Port: 7777"
+          echo "======================================"
+
+          ./LAC_Linux_v1.9.7.x86_64
