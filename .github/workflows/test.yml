@@ -1,0 +1,27 @@
+name: LAC Server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  server:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y screen unzip libc6-i386 lib32stdc++6
+
+      - name: Download LAC
+        run: |
+          wget https://lacrimesonline.com/builds/LAC/LAC_Linux_v1.9.7.zip
+
+      - name: Extract LAC
+        run: |
+          unzip LAC_Linux_v1.9.7.zip
+          chmod +x LAC_Linux_v1.9.7.x86_64
+
+      - name: Start server
+        run: |
+          ./LAC_Linux_v1.9.7.x86_64
